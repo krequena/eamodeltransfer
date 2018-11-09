@@ -13,6 +13,9 @@
 	<properties>
 		<version.jdbc.ucanaccess>4.0.4</version.jdbc.ucanaccess>
 		<version.junit>4.12</version.junit>
+		<version.log4j>2.11.1</version.log4j>
+		<version.commons.lang>3.0</version.commons.lang>
+		<version.h2>1.4.197</version.h2>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.source>1.8</maven.compiler.source>
 	</properties>
@@ -30,6 +33,21 @@
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
 			<version>7.0.0.jre8</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Log4j -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${version.log4j}</version>
+		</dependency>
+
+		<!-- Commons Lang -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${version.commons.lang}</version>
 		</dependency>
 
 		<!-- JUnit. -->
@@ -37,6 +55,14 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${version.junit}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- H2 database -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>${version.h2}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

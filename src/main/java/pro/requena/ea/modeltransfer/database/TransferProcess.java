@@ -1,5 +1,6 @@
 package pro.requena.ea.modeltransfer.database;
 
+import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,6 +8,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import pro.requena.ea.modeltransfer.exceptions.EAModelTransferException;
 
@@ -30,42 +34,45 @@ public class TransferProcess {
     private static final String SETTING_ON = "ON";
     private static final String SETTING_OFF = "OFF";
 
+    private static final Logger LOG = LogManager.getLogger();
+
     /**
      * Performs the database transfer from the source to the destination connections.
      * @param sourceConnection JDBC connection to the source database.
-     * @param destinationConnection JDBC connection to the destination database.
+     * @param targetConnection JDBC connection to the destination database.
      * @throws EAModelTransferException Generic handled exception.
      */
-    public static void modelTransfer(final Connection sourceConnection, final Connection destinationConnection) throws EAModelTransferException {
+    public static void modelTransfer(final Connection sourceConnection, final Connection targetConnection, final boolean batchInsert) throws EAModelTransferException {
+        LOG.info("Start: modelTransfer. BatchInsert: {}.", batchInsert);
         try {
+            // Enable auto-commit on the destination connection.
+            targetConnection.setAutoCommit(true);
+
             // Delete destination tables content.
-            for(String table : tableList) {
-                Statement statement = destinationConnection.createStatement();
-                statement.execute("DELETE FROM " + table);
-            }
-            // Commit the deletions.
-            destinationConnection.commit();
+            deleteTables(targetConnection);
 
             // Copy rows from the source database to the destination database.
             for(String table : tableList) {
+                LOG.info("Inserting rows to table: {}.", table);
+
                 // Gather data.
                 Statement statement = sourceConnection.createStatement();
                 ResultSet resultSet = statement.executeQuery("SELECT * FROM " + table);
                 ResultSetMetaData metadata = resultSet.getMetaData();
 
                 // Enable inserting rows with identity fields fulfilled.
-                changeIdentityInserts(destinationConnection, table, true);
-                
+                changeIdentityInserts(targetConnection, table, true);
+
                 // Prepare insertion statement.
                 String colNames = "";
                 String colParams = "";
                 for(int col=1;col<=metadata.getColumnCount();col++) {
-                    colNames += metadata.getColumnName(col) + ", ";
+                    colNames += "[" + metadata.getColumnName(col) + "], ";
                     colParams += "?, ";
                 }
                 colNames = colNames.substring(0, colNames.length() - 2);
                 colParams = colParams.substring(0, colParams.length() - 2);
-                PreparedStatement insertStatement = destinationConnection.prepareStatement("INSERT INTO " + table + "(" + colNames + ") VALUES (" + colParams + ");");
+                PreparedStatement insertStatement = targetConnection.prepareStatement("INSERT INTO [" + table + "] (" + colNames + ") VALUES (" + colParams + ");");
 
                 // Insert data.
                 while(resultSet.next()) {
@@ -74,40 +81,77 @@ public class TransferProcess {
                            metadata.getColumnType(column) == Types.VARCHAR) {
                             insertStatement.setString(column, resultSet.getString(column));
                         } else if(metadata.getColumnType(column) == Types.NUMERIC ||
-                                  metadata.getColumnType(column) == Types.INTEGER) {
+                                  metadata.getColumnType(column) == Types.INTEGER ||
+                                  metadata.getColumnType(column) == Types.SMALLINT) {
                             insertStatement.setInt(column, resultSet.getInt(column));
                         } else if(metadata.getColumnType(column) == Types.DATE) {
-                          insertStatement.setDate(column, resultSet.getDate(column));
+                            insertStatement.setDate(column, resultSet.getDate(column));
+                        } else if(metadata.getColumnType(column) == Types.TIMESTAMP) {
+                            insertStatement.setTimestamp(column, resultSet.getTimestamp(column));
+                        } else if(metadata.getColumnType(column) == Types.BOOLEAN) {
+                            insertStatement.setBoolean(column, resultSet.getBoolean(column));
+                        } else if(metadata.getColumnType(column) == Types.DOUBLE) {
+                            insertStatement.setDouble(column, resultSet.getDouble(column));
+                        } else if(metadata.getColumnType(column) == Types.VARBINARY) {
+                            if(resultSet.getBinaryStream(column) != null) {
+                                insertStatement.setBinaryStream(column, resultSet.getBinaryStream(column));
+                            } else {
+                                insertStatement.setBinaryStream(column, new ByteArrayInputStream(new byte[0]));
+                            }
+                        } else {
+                            final String errorDescription = "Datatype not handled: " + metadata.getColumnType(column) + "(" +
+                                                            metadata.getColumnTypeName(column) + ") on table " + table + ", column " +
+                                                            metadata.getColumnName(column);
+                            LOG.error(errorDescription);
+                            throw new EAModelTransferException(errorDescription);
                         }
                     }
-                    insertStatement.execute();
+
+                    // Handle insertion mode.
+                    if(batchInsert) {
+                        insertStatement.addBatch();
+                    } else {
+                        insertStatement.execute();
+                    }
+                }
+                if(batchInsert) {
+                    insertStatement.executeBatch();
                 }
 
                 // Disable inserting rows with identity fields fulfilled.
-                changeIdentityInserts(destinationConnection, table, false);
+                changeIdentityInserts(targetConnection, table, false);
             }
-
-            // Commit the insertions.
-            destinationConnection.commit();
+            LOG.info("Finished: modelTransfer.");
         } catch(SQLException exception) {
             throw new EAModelTransferException(exception);
         }
+    }
 
+    /**
+     * Deletes all the rows of all the EA tables from the destination connection.
+     * @param destinationConnection Database connection.
+     * @throws SQLException Exception while handling the deletions.
+     */
+    public static void deleteTables(final Connection destinationConnection) throws SQLException {
+        for(String table : tableList) {
+            LOG.info("Deleting rows from table: {}.", table);
+            Statement statement = destinationConnection.createStatement();
+            statement.execute("DELETE FROM " + table);
+        }
     }
 
     /**
      * Modifies the status of the Insert Identity DB setting.
      * @param destinationConnection {@link java.sql.Connection} to the database.
      * @param value If true, enables the setting. Otherwise, disables it.
-     * @throws SQLException
      */
-    private static void changeIdentityInserts(final Connection destinationConnection, final String tableName, final boolean value) throws SQLException {
+    private static void changeIdentityInserts(final Connection destinationConnection, final String tableName, final boolean value) {
         try {
             Statement identityStmt = destinationConnection.createStatement();
-            identityStmt.executeQuery("SET IDENTITY_INSERT " + tableName + " " + (value ? SETTING_ON : SETTING_OFF));
+            identityStmt.execute("SET IDENTITY_INSERT " + tableName + " " + (value ? SETTING_ON : SETTING_OFF));
             identityStmt.close();
         } catch (Exception e) {
-            System.out.println("Table " + tableName + " does not have identity fields.");
+            // Left empty intendedly.
         }
     }
 }

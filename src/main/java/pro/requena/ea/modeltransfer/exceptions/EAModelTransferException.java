@@ -16,4 +16,12 @@ public class EAModelTransferException extends Exception {
     public EAModelTransferException(Exception exception) {
         super(exception);
     }
+
+    /**
+     * Exception message.
+     * @param message Content of the exception.
+     */
+    public EAModelTransferException(String message) {
+        super(message);
+    }
 }

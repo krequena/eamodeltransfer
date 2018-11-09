@@ -3,6 +3,10 @@ package pro.requena.ea.modeltransfer.database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import pro.requena.ea.modeltransfer.exceptions.EAModelTransferException;
 
 /**
@@ -12,8 +16,11 @@ import pro.requena.ea.modeltransfer.exceptions.EAModelTransferException;
  * @since 0.1
  */
 public class EADatabase {
-    
+
     private static final String PREFIX_JDBC = "jdbc:";
+    private static final int LIMIT_JDBC = 30;
+
+    private static final Logger LOG = LogManager.getLogger();
 
     /**
      * Create a new database connection to a given EAP/DSN.
@@ -37,8 +44,10 @@ public class EADatabase {
      */
     private static final Connection connectEap(final String eapFilePath) throws EAModelTransferException {
         try {
+            LOG.info("Connecting to EAP file: {}", eapFilePath);
             return DriverManager.getConnection("jdbc:ucanaccess://" + eapFilePath + ";memory=false");
         } catch (Exception e) {
+            LOG.error("Couldn't open the EAP file connection.");
             throw new EAModelTransferException(e);
         }
     }
@@ -51,6 +60,7 @@ public class EADatabase {
      */
     private static final Connection connectDsn(final String dsn) throws EAModelTransferException {
         try {
+            LOG.info("Connecting to DB using DSN: {}...", StringUtils.substring(dsn, 0, LIMIT_JDBC));
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             return DriverManager.getConnection(dsn);
         } catch (Exception e) {
@@ -65,6 +75,7 @@ public class EADatabase {
      */
     public static final void close(final Connection connection) throws EAModelTransferException {
         try {
+            LOG.info("Closing connection.");
             connection.close();
         } catch (Exception e) {
             throw new EAModelTransferException(e);

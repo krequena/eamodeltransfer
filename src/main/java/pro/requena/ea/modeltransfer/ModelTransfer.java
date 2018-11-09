@@ -16,21 +16,22 @@ public final class ModelTransfer {
 
     /**
      * This method performs the Model Transfer operation from a source model to a given destination.
-     * @param source
-     * @param destination
+     * @param source The source file or DSN.
+     * @param target The target file or DSN.
+     * @param batchInsert
      * @throws EAModelTransferException 
      */
-    public final void transfer(final String source, final String destination) throws EAModelTransferException {
+    public final void transfer(final String source, final String target, final boolean batchInsert) throws EAModelTransferException {
         // Connect to the source and destination databases.
         Connection sourceConnection = EADatabase.connect(source);
-        Connection destinationConnection = EADatabase.connect(destination);
+        Connection targetConnection = EADatabase.connect(target);
 
         // Transfer process.
-        TransferProcess.modelTransfer(sourceConnection, destinationConnection);
+        TransferProcess.modelTransfer(sourceConnection, targetConnection, batchInsert);
 
         // Close the opened database connections.
         EADatabase.close(sourceConnection);
-        EADatabase.close(destinationConnection);
+        EADatabase.close(targetConnection);
     }
 
 }

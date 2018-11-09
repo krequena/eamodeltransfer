@@ -6,7 +6,15 @@ import org.junit.Test;
 
 import pro.requena.ea.modeltransfer.exceptions.EAModelTransferException;
 
+/**
+ * Model Transfer test class.
+ * @author krequena
+ *
+ */
 public class ModelTransferTest {
+    
+    private static final String SOURCE_EAPX = "source.eapx";
+    private static final String TARGET_EAPX = "target.eapx";
 
     private ModelTransfer modelTransfer = null;
     
@@ -20,11 +28,5 @@ public class ModelTransferTest {
         modelTransfer = null;
     }
 
-    @Test
-    public void testModelTransfer() throws EAModelTransferException {
-        String source = "source.eap";
-        String destination = "";
-        modelTransfer.transfer(source, destination);
-    }
 
 }
