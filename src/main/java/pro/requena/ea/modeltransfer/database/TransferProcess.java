@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -72,7 +73,14 @@ public class TransferProcess {
                 }
                 colNames = colNames.substring(0, colNames.length() - 2);
                 colParams = colParams.substring(0, colParams.length() - 2);
-                PreparedStatement insertStatement = targetConnection.prepareStatement("INSERT INTO [" + table + "] (" + colNames + ") VALUES (" + colParams + ");");
+                String insertString = "INSERT INTO [" + table + "] ";
+                if(!StringUtils.equals(targetConnection.getMetaData().getDriverName(), "H2 JDBC Driver")) {
+                	insertString +="(" + colNames + ") ";
+                } else {
+                	insertString = insertString.replace("[", "").replace("]", "");
+                }
+                insertString += "VALUES (" + colParams + ");";
+                PreparedStatement insertStatement = targetConnection.prepareStatement(insertString);
 
                 // Insert data.
                 while(resultSet.next()) {
