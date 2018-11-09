@@ -28,5 +28,18 @@ public class ModelTransferTest {
         modelTransfer = null;
     }
 
+//    @Test
+    public void testLocalToLocal() throws EAModelTransferException {
+    	final String source = Thread.currentThread().getContextClassLoader().getResource(SOURCE_EAPX).getPath();
+    	final String target = Thread.currentThread().getContextClassLoader().getResource(TARGET_EAPX).getPath();
+    	modelTransfer.transfer(source, target, false);
+    }
+
+//    @Test
+    public void testLocalToDBMS() throws EAModelTransferException {
+    	final String source = Thread.currentThread().getContextClassLoader().getResource(SOURCE_EAPX).getPath();
+    	final String target = "jdbc:h2:mem:";
+    	modelTransfer.transfer(source, target, false);
+    }
 
 }
