@@ -64,12 +64,18 @@ public class ModelTransferTest {
 		TransferProcess.modelTransfer(sourceConnection, targetConnection, false);
 	}
 
-	public static void importSQL(Connection conn, InputStream in) throws SQLException {
-		Scanner s = new Scanner(in);
+	/**
+	 * Prerequisite: Load the SQL script to the testing database.
+	 * @param connection Target connection.
+	 * @param inputStream Source script stream.
+	 * @throws SQLException Non-handled exception.
+	 */
+	private static void importSQL(Connection connection, InputStream inputStream) throws SQLException {
+		Scanner s = new Scanner(inputStream);
 		s.useDelimiter("(;(\r)?\n)|(--\n)");
 		Statement st = null;
 		try {
-			st = conn.createStatement();
+			st = connection.createStatement();
 			while (s.hasNext()) {
 				String line = s.next();
 				if (line.startsWith("/*!") && line.endsWith("*/")) {
