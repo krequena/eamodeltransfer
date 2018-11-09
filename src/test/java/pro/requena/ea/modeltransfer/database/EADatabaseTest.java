@@ -16,7 +16,7 @@ import pro.requena.ea.modeltransfer.exceptions.EAModelTransferException;
  */
 public class EADatabaseTest {
 
-    private static final String SOURCE_EAPX = "source.eapx";
+    private static final String SOURCE_EAPX = "eapx/source.eapx";
     
     @Test
     public void testConnectEAP() throws EAModelTransferException, SQLException {
