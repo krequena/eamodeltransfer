@@ -64,25 +64,10 @@ public class TransferProcess {
                 // Enable inserting rows with identity fields fulfilled.
                 changeIdentityInserts(targetConnection, table, true);
 
-                // Prepare insertion statement.
-                String colNames = "";
-                String colParams = "";
-                for(int col=1;col<=metadata.getColumnCount();col++) {
-                    colNames += "[" + metadata.getColumnName(col) + "], ";
-                    colParams += "?, ";
-                }
-                colNames = colNames.substring(0, colNames.length() - 2);
-                colParams = colParams.substring(0, colParams.length() - 2);
-                String insertString = "INSERT INTO [" + table + "] ";
-                if(!StringUtils.equals(targetConnection.getMetaData().getDriverName(), "H2 JDBC Driver")) {
-                	insertString +="(" + colNames + ") ";
-                } else {
-                	insertString = insertString.replace("[", "").replace("]", "");
-                }
-                insertString += "VALUES (" + colParams + ");";
-                PreparedStatement insertStatement = targetConnection.prepareStatement(insertString);
+                // Create an insertion statement.
+                PreparedStatement insertStatement = prepareInsertStatement(targetConnection, table, metadata);
 
-                // Insert data.
+                // Update the insertion statement with the source row data.
                 while(resultSet.next()) {
                     for(int column=1;column<=metadata.getColumnCount();column++) {
                         if(metadata.getColumnType(column) == Types.CHAR ||
@@ -114,11 +99,15 @@ public class TransferProcess {
                             throw new EAModelTransferException(errorDescription);
                         }
                     }
-
+if(StringUtils.equals(table, "t_stereotypes")) {
+	System.out.println("STOP");
+}
                     // Handle insertion mode.
                     if(batchInsert) {
+                    	// Queue the insertion to be handled after working with all the table rows.
                         insertStatement.addBatch();
                     } else {
+                    	// Perform the insertion.
                         insertStatement.execute();
                     }
                 }
@@ -135,17 +124,50 @@ public class TransferProcess {
         }
     }
 
+	/**
+	 * Creates a insertion {@link java.sql.PreparedStatement} for a connection given a specific table. 
+	 * @param connection Connection to the database.
+	 * @param table Table to create the insertion statement for.
+	 * @param metadata ResultSet metadata.
+	 * @return Newly-created {@link java.sql.PreparedStatement}.
+	 * @throws SQLException Database exception.
+	 */
+	private static PreparedStatement prepareInsertStatement(final Connection connection, final String table,
+			final ResultSetMetaData metadata) throws SQLException {
+		// Gather the column names and prepare the parameter list.
+		String colNames = "";
+		String colParams = "";
+		for(int col=1;col<=metadata.getColumnCount();col++) {
+		    colNames += "[" + metadata.getColumnName(col) + "], ";
+		    colParams += "?, ";
+		}
+		colNames = colNames.substring(0, colNames.length() - 2);
+		colParams = colParams.substring(0, colParams.length() - 2);
+
+		// Create the insertion SQL depending on the database. H2 (used in tests) doesn't need the column names nor '[]'.
+		String insertString = "INSERT INTO [" + table + "] ";
+		if(!StringUtils.equals(connection.getMetaData().getDriverName(), "H2 JDBC Driver")) {
+			insertString +="(" + colNames + ") ";
+		} else {
+			insertString = insertString.replace("[", "").replace("]", "");
+		}
+		insertString += "VALUES (" + colParams + ");";
+		PreparedStatement insertStatement = connection.prepareStatement(insertString);
+		return insertStatement;
+	}
+
     /**
-     * Deletes all the rows of all the EA tables from the destination connection.
-     * @param destinationConnection Database connection.
+     * Deletes all the rows of all the EA tables from the target connection.
+     * @param targetConnection Database connection.
      * @throws SQLException Exception while handling the deletions.
      */
-    public static void deleteTables(final Connection destinationConnection) throws SQLException {
+    public static void deleteTables(final Connection targetConnection) throws SQLException {
         for(String table : tableList) {
             LOG.info("Deleting rows from table: {}.", table);
-            Statement statement = destinationConnection.createStatement();
+            Statement statement = targetConnection.createStatement();
             statement.execute("DELETE FROM " + table);
         }
+        targetConnection.commit();
     }
 
     /**
