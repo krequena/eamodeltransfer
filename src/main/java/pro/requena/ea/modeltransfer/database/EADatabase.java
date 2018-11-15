@@ -28,16 +28,16 @@ public class EADatabase {
      * @return Opened {@link java.sql.Connection} to the given database.
      * @throws EAModelTransferException Generic handled exception.
      */
-    public static final Connection connect(final String eapFilePath) throws EAModelTransferException {
-        if(eapFilePath.toLowerCase().startsWith(PREFIX_JDBC)) {
-            return connectDsn(eapFilePath);
+    public static final Connection connect(final String endpoint) throws EAModelTransferException {
+        if(endpoint.toLowerCase().startsWith(PREFIX_JDBC)) {
+            return connectDsn(endpoint);
         } else {
-            return connectEap(eapFilePath);
+            return connectEap(endpoint);
         }
     }
 
     /**
-     * Creates a connection to an EAP file.
+     * Creates a JDBC connection to an EAP file.
      * @param eapFilePath EAP file path.
      * @return Connection.
      * @throws EAModelTransferException Generic handled exception.
@@ -53,8 +53,10 @@ public class EADatabase {
     }
 
     /**
-     * Creates a connection to a DSN.
-     * @param dsn DSN.
+     * Creates a JDBC connection by using a DSN.
+     * Caution: first {@link LIMIT_JDBC} characters are printed on log.
+     * 
+     * @param dsn JDBC DSN.
      * @return Connection.
      * @throws EAModelTransferException Generic handled exception.
      */

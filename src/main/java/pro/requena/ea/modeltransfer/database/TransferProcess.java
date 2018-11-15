@@ -16,9 +16,10 @@ import org.apache.logging.log4j.Logger;
 import pro.requena.ea.modeltransfer.exceptions.EAModelTransferException;
 
 /**
- * Model transfer process.
+ * Model transfer process class.
+ * 
  * @author krequena
- *
+ * @since 0.1
  */
 public class TransferProcess {
 
@@ -41,6 +42,7 @@ public class TransferProcess {
      * Performs the database transfer from the source to the destination connections.
      * @param sourceConnection JDBC connection to the source database.
      * @param targetConnection JDBC connection to the destination database.
+     * @param batchInsert Performs the insertions in batch mode, which enhances the overall performance of the operation. 
      * @throws EAModelTransferException Generic handled exception.
      */
     public static void modelTransfer(final Connection sourceConnection, final Connection targetConnection, final boolean batchInsert) throws EAModelTransferException {
@@ -99,9 +101,7 @@ public class TransferProcess {
                             throw new EAModelTransferException(errorDescription);
                         }
                     }
-if(StringUtils.equals(table, "t_stereotypes")) {
-	System.out.println("STOP");
-}
+
                     // Handle insertion mode.
                     if(batchInsert) {
                     	// Queue the insertion to be handled after working with all the table rows.

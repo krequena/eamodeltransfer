@@ -2,8 +2,9 @@ package pro.requena.ea.modeltransfer.exceptions;
 
 /**
  * EA Model Transfer library generic exception.
+ * 
  * @author krequena
- *
+ * @since 0.1
  */
 public class EAModelTransferException extends Exception {
 

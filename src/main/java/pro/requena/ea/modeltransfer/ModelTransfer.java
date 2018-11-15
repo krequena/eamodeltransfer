@@ -18,8 +18,8 @@ public final class ModelTransfer {
      * This method performs the Model Transfer operation from a source model to a given destination.
      * @param source The source file or DSN.
      * @param target The target file or DSN.
-     * @param batchInsert
-     * @throws EAModelTransferException 
+     * @param batchInsert Performs the insertions in batch mode, which enhances the overall performance of the operation.
+     * @throws EAModelTransferException Global exception that contains the information on what has happened.
      */
     public final void transfer(final String source, final String target, final boolean batchInsert) throws EAModelTransferException {
         // Connect to the source and destination databases.
