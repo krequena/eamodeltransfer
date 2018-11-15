@@ -21,9 +21,10 @@
 	</licenses>
 
 	<scm>
-		<url>https://github.com/krequena/eamodeltransfer</url>
 		<connection>scm:git:git://github.com/krequena/eamodeltransfer.git</connection>
-		<developerConnection>scm:git:git@github.com/krequena/eamodeltransfer.git</developerConnection>
+		<developerConnection>scm:git:git@github.com:krequena/eamodeltransfer.git</developerConnection>
+		<url>https://github.com/krequena/eamodeltransfer</url>
+		<tag>HEAD</tag>
 	</scm>
 
 	<developers>
@@ -39,13 +40,20 @@
 		<!-- Project dependencies versions. -->
 		<version.jdbc.ucanaccess>4.0.4</version.jdbc.ucanaccess>
 		<version.log4j>2.11.1</version.log4j>
-		<version.plugin.javadoc>3.0.1</version.plugin.javadoc>
 		<version.commons.lang>3.0</version.commons.lang>
 
 		<!-- Test dependencies versions. -->
 		<version.junit>4.12</version.junit>
 		<version.jdbc.mssql>7.0.0.jre8</version.jdbc.mssql>
 		<version.jdbc.h2>1.4.197</version.jdbc.h2>
+
+		<!-- Maven plugins versions. -->
+		<version.plugin.javadoc>3.0.1</version.plugin.javadoc>
+		<version.plugin.deploy>3.0.0-M1</version.plugin.deploy>
+		<version.plugin.release>2.5.3</version.plugin.release>
+		<version.nexus.plugin>1.6.8</version.nexus.plugin>
+		<version.source.plugin>3.0.1</version.source.plugin>
+		<version.gpg.plugin>1.6</version.gpg.plugin>
 
 		<!-- Java source and target versions. -->
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -121,6 +129,112 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- Maven Deploy plugin -->
+			<plugin>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>${version.plugin.deploy}</version>
+				<executions>
+					<execution>
+						<id>default-deploy</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>deploy</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Maven Release plugin. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>${version.plugin.release}</version>
+				<configuration>
+					<localCheckout>true</localCheckout>
+					<pushChanges>false</pushChanges>
+					<mavenExecutorId>forked-path</mavenExecutorId>
+					<arguments>-Dgpg.passphrase=${gpg.passphrase}</arguments>
+				</configuration>
+			</plugin>
+
+			<!-- Nexus plugin. -->
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>${version.nexus.plugin}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>${version.source.plugin}</version>
+				<configuration>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>attach-javadoc</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
+
+	<profiles>
+		<!-- GPG Signature on release -->
+		<profile>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>performRelease</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>${version.gpg.plugin}</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
