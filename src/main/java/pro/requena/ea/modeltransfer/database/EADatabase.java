@@ -45,7 +45,7 @@ public class EADatabase {
     private static final Connection connectEap(final String eapFilePath) throws EAModelTransferException {
         try {
             LOG.info("Connecting to EAP file: {}", eapFilePath);
-            return DriverManager.getConnection("jdbc:ucanaccess://" + eapFilePath + ";memory=false");
+            return DriverManager.getConnection("jdbc:ucanaccess://" + eapFilePath + ";memory=false;immediatelyReleaseResources=true");
         } catch (Exception e) {
             LOG.error("Couldn't open the EAP file connection.");
             throw new EAModelTransferException(e);
