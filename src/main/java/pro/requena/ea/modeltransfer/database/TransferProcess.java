@@ -10,8 +10,8 @@ import java.sql.Statement;
 import java.sql.Types;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import pro.requena.ea.modeltransfer.exceptions.EAModelTransferException;
 
@@ -36,7 +36,7 @@ public class TransferProcess {
     private static final String SETTING_ON = "ON";
     private static final String SETTING_OFF = "OFF";
 
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LoggerFactory.getLogger(TransferProcess.class);
 
     /**
      * Performs the database transfer from the source to the destination connections.

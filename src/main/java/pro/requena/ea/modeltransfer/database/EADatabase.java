@@ -4,8 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import pro.requena.ea.modeltransfer.exceptions.EAModelTransferException;
 
@@ -20,7 +20,7 @@ public class EADatabase {
     private static final String PREFIX_JDBC = "jdbc:";
     private static final int LIMIT_JDBC = 30;
 
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LoggerFactory.getLogger(EADatabase.class);
 
     /**
      * Create a new database connection to a given EAP/DSN.
@@ -63,7 +63,6 @@ public class EADatabase {
     private static final Connection connectDsn(final String dsn) throws EAModelTransferException {
         try {
             LOG.info("Connecting to DB using DSN: {}...", StringUtils.substring(dsn, 0, LIMIT_JDBC));
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             return DriverManager.getConnection(dsn);
         } catch (Exception e) {
             throw new EAModelTransferException(e);
