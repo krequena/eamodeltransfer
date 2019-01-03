@@ -9,10 +9,10 @@ Specifically, it provides a way to perform Model Transfer operations that are no
 ## Dependencies
 
 This library makes use of:
-* `UCanAccess <https://ucanaccess.sourceforge.net>`_ to use Microsoft JET databases.
-* `SLF4J <https://www.slf4j.org/>`_ as logging façade.
-* `Commons Lang <https://commons.apache.org/proper/commons-lang/>`_.
-* `H2 <http://www.h2database.com>`_ as testing in-memory database.
+* UCanAccess (https://ucanaccess.sourceforge.net) to use Microsoft JET databases.
+* SLF4J (https://www.slf4j.org/) as logging façade.
+* Commons Lang (https://commons.apache.org/proper/commons-lang/).
+* H2 (http://www.h2database.com) as in-memory testing database.
 
 ## Documentation and Usage
 
