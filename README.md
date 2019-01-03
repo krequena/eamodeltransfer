@@ -1,7 +1,5 @@
 # eamodeltransfer - Java library for Enterprise Architect
 
-![https://requena.pro/jenkins/buildStatus/icon?job=krequena/eamodeltransfer/master](https://requena.pro/jenkins/buildStatus/icon?job=krequena/eamodeltransfer/master)
-
 ## Description
 
 EAModelTransfer is an open-source Java library which aims to provide a high-performant solution to an specific commercial product (Sparx Systems Enterprise Architect).
