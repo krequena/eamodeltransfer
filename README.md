@@ -1,6 +1,6 @@
 # eamodeltransfer - Java library for Enterprise Architect
 
-[![Build Status](https://requena.pro/jenkins/buildStatus/icon?job=krequena/eamodeltransfer/master)](https://requena.pro/jenkins/job/krequena/job/eamodeltransfer/job/master/)
+![Build Status](https://requena.pro/jenkins/buildStatus/icon?job=krequena/eamodeltransfer/master)
 
 ## Description
 
