@@ -118,6 +118,7 @@
 				<version>${version.plugin.javadoc}</version>
 				<configuration>
 					<show>public</show>
+					<destDir>docs</destDir>
 				</configuration>
 				<executions>
 					<execution>
