@@ -1,6 +1,7 @@
 package pro.requena.ea.modeltransfer;
 
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -24,7 +25,7 @@ public class ModelTransferTest {
 
 	// EAPX testing files.
 	private static final String SOURCE_EAPX = "eapx/source.eapx";
-	private static final String TARGET_EAPX = "eapx/target.eapx";
+	private static final String TARGET_EAPX = "target.eapx";
 
 	// Database SQL scripts.
 	private static final String SCHEMA_SQL_SCRIPT = "scripts/EASchema_1220_H2.sql";
@@ -44,12 +45,12 @@ public class ModelTransferTest {
 	/**
 	 * Tests file-to-file model transfer against an existing target file.
 	 * @throws EAModelTransferException
+	 * @throws URISyntaxException 
 	 */
     @Test
-	public void testLocalToLocal() throws EAModelTransferException {
+	public void testLocalToLocal() throws EAModelTransferException, URISyntaxException {
 		final String source = Thread.currentThread().getContextClassLoader().getResource(SOURCE_EAPX).getPath();
-		final String target = Thread.currentThread().getContextClassLoader().getResource(TARGET_EAPX).getPath();
-		modelTransfer.transfer(source, target, false);
+		modelTransfer.transfer(source, TARGET_EAPX, false);
 	}
 
 	/**
@@ -59,7 +60,7 @@ public class ModelTransferTest {
 	@Test
 	public void testLocalToLocalNewTargetFile() throws EAModelTransferException {
 		final String source = Thread.currentThread().getContextClassLoader().getResource(SOURCE_EAPX).getPath();
-		modelTransfer.transfer(source, "target.eapx", false);
+		modelTransfer.transfer(source, TARGET_EAPX, false);
 	}
 
 	@Test
