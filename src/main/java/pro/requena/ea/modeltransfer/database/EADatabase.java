@@ -52,6 +52,7 @@ public class EADatabase {
             LOG.info("Connecting to EAP file: {}", eapFilePath);
             // Create the target file if it does not exist.
             if(isTarget && Files.exists(Paths.get(eapFilePath))) {
+            	LOG.info("File {} doesn't exist. Copying the Sparx's EAPX template.", eapFilePath);
             	Files.copy(Paths.get(Thread.currentThread().getContextClassLoader().getResource(EADatabase.DEFAULT_EAPX_PATH).getPath()),
             			   Paths.get(eapFilePath), StandardCopyOption.REPLACE_EXISTING);
             }
