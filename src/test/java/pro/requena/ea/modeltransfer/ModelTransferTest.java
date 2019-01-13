@@ -1,5 +1,6 @@
 package pro.requena.ea.modeltransfer;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.sql.Connection;
@@ -56,11 +57,13 @@ public class ModelTransferTest {
 	/**
 	 * Tests file-to-file model transfer against an unexisting target file.
 	 * @throws EAModelTransferException
+	 * @throws IOException 
 	 */
 	@Test
-	public void testLocalToLocalNewTargetFile() throws EAModelTransferException {
+	public void testLocalToLocalNewTargetFile() throws EAModelTransferException, IOException {
 		final String source = Thread.currentThread().getContextClassLoader().getResource(SOURCE_EAPX).getPath();
-		modelTransfer.transfer(source, TARGET_EAPX, false);
+		// Transfer to a new file, which name is generated from the system timestamp.
+		modelTransfer.transfer(source, System.currentTimeMillis() + TARGET_EAPX, false);
 	}
 
 	@Test
