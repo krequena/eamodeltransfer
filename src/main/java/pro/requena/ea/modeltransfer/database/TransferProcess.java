@@ -87,7 +87,8 @@ public class TransferProcess {
                             insertStatement.setBoolean(column, resultSet.getBoolean(column));
                         } else if(metadata.getColumnType(column) == Types.DOUBLE) {
                             insertStatement.setDouble(column, resultSet.getDouble(column));
-                        } else if(metadata.getColumnType(column) == Types.VARBINARY) {
+                        } else if(metadata.getColumnType(column) == Types.VARBINARY ||
+                        		  metadata.getColumnType(column) == Types.BLOB) {
                             if(resultSet.getBinaryStream(column) != null) {
                                 insertStatement.setBinaryStream(column, resultSet.getBinaryStream(column));
                             } else {

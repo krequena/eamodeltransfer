@@ -23,8 +23,8 @@ public final class ModelTransfer {
      */
     public final void transfer(final String source, final String target, final boolean batchInsert) throws EAModelTransferException {
         // Connect to the source and destination databases.
-        Connection sourceConnection = EADatabase.connect(source);
-        Connection targetConnection = EADatabase.connect(target);
+        Connection sourceConnection = EADatabase.connect(source, false);
+        Connection targetConnection = EADatabase.connect(target, true);
 
         // Transfer process.
         TransferProcess.modelTransfer(sourceConnection, targetConnection, batchInsert);

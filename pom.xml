@@ -36,7 +36,7 @@
 
 	<properties>
 		<!-- Project dependencies versions. -->
-		<version.jdbc.ucanaccess>4.0.4</version.jdbc.ucanaccess>
+		<version.jdbc.ucanaccess>4.0.3</version.jdbc.ucanaccess>
 		<version.slf4j>1.7.25</version.slf4j>
 		<version.commons.lang>3.0</version.commons.lang>
 

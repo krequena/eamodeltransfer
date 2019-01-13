@@ -22,7 +22,7 @@ import pro.requena.ea.modeltransfer.exceptions.EAModelTransferException;
  */
 public class ModelTransferTest {
 
-	// EAPX files.
+	// EAPX testing files.
 	private static final String SOURCE_EAPX = "eapx/source.eapx";
 	private static final String TARGET_EAPX = "eapx/target.eapx";
 
@@ -41,11 +41,25 @@ public class ModelTransferTest {
 		modelTransfer = null;
 	}
 
-//    @Test
+	/**
+	 * Tests file-to-file model transfer against an existing target file.
+	 * @throws EAModelTransferException
+	 */
+    @Test
 	public void testLocalToLocal() throws EAModelTransferException {
 		final String source = Thread.currentThread().getContextClassLoader().getResource(SOURCE_EAPX).getPath();
 		final String target = Thread.currentThread().getContextClassLoader().getResource(TARGET_EAPX).getPath();
 		modelTransfer.transfer(source, target, false);
+	}
+
+	/**
+	 * Tests file-to-file model transfer against an unexisting target file.
+	 * @throws EAModelTransferException
+	 */
+	@Test
+	public void testLocalToLocalNewTargetFile() throws EAModelTransferException {
+		final String source = Thread.currentThread().getContextClassLoader().getResource(SOURCE_EAPX).getPath();
+		modelTransfer.transfer(source, "target.eapx", false);
 	}
 
 	@Test
@@ -54,8 +68,8 @@ public class ModelTransferTest {
 		final String target = "jdbc:h2:mem:";
 
 		// Connect to the source and destination databases.
-		Connection sourceConnection = EADatabase.connect(source);
-		Connection targetConnection = EADatabase.connect(target);
+		Connection sourceConnection = EADatabase.connect(source, false);
+		Connection targetConnection = EADatabase.connect(target, true);
 
 		// Load the EA base DB script to the target connection.
 		importSQL(targetConnection, Thread.currentThread().getContextClassLoader().getResourceAsStream(SCHEMA_SQL_SCRIPT));

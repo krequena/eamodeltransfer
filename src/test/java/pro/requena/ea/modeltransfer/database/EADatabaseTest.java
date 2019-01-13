@@ -20,7 +20,7 @@ public class EADatabaseTest {
     
     @Test
     public void testConnectEAP() throws EAModelTransferException, SQLException {
-        Connection connection = EADatabase.connect(Thread.currentThread().getContextClassLoader().getResource(SOURCE_EAPX).getPath());
+        Connection connection = EADatabase.connect(Thread.currentThread().getContextClassLoader().getResource(SOURCE_EAPX).getPath(), false);
         assertEquals(2, connection.getMetaData().getDatabaseMajorVersion());
         assertEquals(3, connection.getMetaData().getDatabaseMinorVersion());
         assertEquals("UCanAccess driver for Microsoft Access databases using HSQLDB", connection.getMetaData().getDatabaseProductName());
@@ -34,7 +34,7 @@ public class EADatabaseTest {
     @Test
     public void testConnectDSN() {
         try {
-            EADatabase.connect("jdbc:nodriver://");
+            EADatabase.connect("jdbc:nodriver://", false);
         } catch(EAModelTransferException exception) {
             // Check for a specific database connection-related exception.
             assertEquals("java.sql.SQLException: No suitable driver found for jdbc:nodriver://", exception.getMessage());

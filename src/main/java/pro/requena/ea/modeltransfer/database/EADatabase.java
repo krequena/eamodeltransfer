@@ -1,5 +1,8 @@
 package pro.requena.ea.modeltransfer.database;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
@@ -20,6 +23,8 @@ public class EADatabase {
     private static final String PREFIX_JDBC = "jdbc:";
     private static final int LIMIT_JDBC = 30;
 
+    private static final String DEFAULT_EAPX_PATH = "EABase_JET4.eapx";
+
     private static final Logger LOG = LoggerFactory.getLogger(EADatabase.class);
 
     /**
@@ -28,11 +33,11 @@ public class EADatabase {
      * @return Opened {@link java.sql.Connection} to the given database.
      * @throws EAModelTransferException Generic handled exception.
      */
-    public static final Connection connect(final String endpoint) throws EAModelTransferException {
+    public static final Connection connect(final String endpoint, final boolean isTarget) throws EAModelTransferException {
         if(endpoint.toLowerCase().startsWith(PREFIX_JDBC)) {
             return connectDsn(endpoint);
         } else {
-            return connectEap(endpoint);
+            return connectEap(endpoint, isTarget);
         }
     }
 
@@ -42,9 +47,14 @@ public class EADatabase {
      * @return Connection.
      * @throws EAModelTransferException Generic handled exception.
      */
-    private static final Connection connectEap(final String eapFilePath) throws EAModelTransferException {
+    private static final Connection connectEap(final String eapFilePath, final boolean isTarget) throws EAModelTransferException {
         try {
             LOG.info("Connecting to EAP file: {}", eapFilePath);
+            // Create the target file if it does not exist.
+            if(isTarget && Files.exists(Paths.get(eapFilePath))) {
+            	Files.copy(Paths.get(Thread.currentThread().getContextClassLoader().getResource(EADatabase.DEFAULT_EAPX_PATH).getPath()),
+            			   Paths.get(eapFilePath), StandardCopyOption.REPLACE_EXISTING);
+            }
             return DriverManager.getConnection("jdbc:ucanaccess://" + eapFilePath + ";memory=false;immediatelyReleaseResources=true");
         } catch (Exception e) {
             LOG.error("Couldn't open the EAP file connection.");
