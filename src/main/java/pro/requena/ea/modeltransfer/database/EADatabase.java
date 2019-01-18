@@ -30,6 +30,7 @@ public class EADatabase {
     /**
      * Create a new database connection to a given EAP/DSN.
      * @param endpoint Endpoint. Can be an EAP file or a DSN specification.
+     * @param isTarget Set to true if the connection will be used as a target.
      * @return Opened {@link java.sql.Connection} to the given database.
      * @throws EAModelTransferException Generic handled exception.
      */
