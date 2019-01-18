@@ -73,7 +73,8 @@ public class TransferProcess {
                 while(resultSet.next()) {
                     for(int column=1;column<=metadata.getColumnCount();column++) {
                         if(metadata.getColumnType(column) == Types.CHAR ||
-                           metadata.getColumnType(column) == Types.VARCHAR) {
+                           metadata.getColumnType(column) == Types.VARCHAR ||
+                           metadata.getColumnType(column) == Types.NVARCHAR) {
                             insertStatement.setString(column, resultSet.getString(column));
                         } else if(metadata.getColumnType(column) == Types.NUMERIC ||
                                   metadata.getColumnType(column) == Types.INTEGER ||
@@ -88,11 +89,18 @@ public class TransferProcess {
                         } else if(metadata.getColumnType(column) == Types.DOUBLE) {
                             insertStatement.setDouble(column, resultSet.getDouble(column));
                         } else if(metadata.getColumnType(column) == Types.VARBINARY ||
-                        		  metadata.getColumnType(column) == Types.BLOB) {
+                                metadata.getColumnType(column) == Types.BLOB) {
                             if(resultSet.getBinaryStream(column) != null) {
                                 insertStatement.setBinaryStream(column, resultSet.getBinaryStream(column));
                             } else {
                                 insertStatement.setBinaryStream(column, new ByteArrayInputStream(new byte[0]));
+                            }
+                        } else if(metadata.getColumnType(column) == Types.LONGVARBINARY) {
+                            // SQL-Server conversion.
+                            if(resultSet.getBlob(column) == null || resultSet.getBlob(column).length() == 0) {
+                                insertStatement.setBinaryStream(column, new ByteArrayInputStream(new byte[0]));
+                            } else {
+                                insertStatement.setBinaryStream(column, new ByteArrayInputStream(resultSet.getBlob(column).getBytes(1L, (int) resultSet.getBlob(column).length())));
                             }
                         } else {
                             final String errorDescription = "Datatype not handled: " + metadata.getColumnType(column) + "(" +

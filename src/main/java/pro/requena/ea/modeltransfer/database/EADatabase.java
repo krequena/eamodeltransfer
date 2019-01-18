@@ -53,7 +53,7 @@ public class EADatabase {
             // Create the target file if it does not exist.
             if(isTarget && !Files.exists(Paths.get(eapFilePath))) {
             	LOG.info("File {} doesn't exist. Copying the Sparx's EAPX template.", eapFilePath);
-            	Files.copy(Paths.get(Thread.currentThread().getContextClassLoader().getResource(EADatabase.DEFAULT_EAPX_PATH).toURI()),
+            	Files.copy(Thread.currentThread().getContextClassLoader().getResourceAsStream(EADatabase.DEFAULT_EAPX_PATH),
             			   Paths.get(eapFilePath), StandardCopyOption.REPLACE_EXISTING);
             }
             return DriverManager.getConnection("jdbc:ucanaccess://" + eapFilePath + ";memory=false;immediatelyReleaseResources=true");
