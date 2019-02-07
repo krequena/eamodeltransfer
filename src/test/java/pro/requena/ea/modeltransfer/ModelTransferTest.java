@@ -3,6 +3,8 @@ package pro.requena.ea.modeltransfer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -26,7 +28,7 @@ public class ModelTransferTest {
 
 	// EAPX testing files.
 	private static final String SOURCE_EAPX = "eapx/source.eapx";
-	private static final String TARGET_EAPX = "target.eapx";
+	private static final String TARGET_EAPX = "target/target.eapx";
 
 	// Database SQL scripts.
 	private static final String SCHEMA_SQL_SCRIPT = "scripts/EASchema_1220_H2.sql";
@@ -47,11 +49,15 @@ public class ModelTransferTest {
 	 * Tests file-to-file model transfer against an existing target file.
 	 * @throws EAModelTransferException
 	 * @throws URISyntaxException 
+	 * @throws IOException 
 	 */
     @Test
-	public void testLocalToLocal() throws EAModelTransferException, URISyntaxException {
+	public void testLocalToLocal() throws EAModelTransferException, URISyntaxException, IOException {
 		final String source = Thread.currentThread().getContextClassLoader().getResource(SOURCE_EAPX).getPath();
 		modelTransfer.transfer(source, TARGET_EAPX, false);
+
+		// Remove the created file.
+		Files.delete(Paths.get(TARGET_EAPX));
 	}
 
 	/**
@@ -62,8 +68,12 @@ public class ModelTransferTest {
 	@Test
 	public void testLocalToLocalNewTargetFile() throws EAModelTransferException, IOException {
 		final String source = Thread.currentThread().getContextClassLoader().getResource(SOURCE_EAPX).getPath();
+		String target = TARGET_EAPX.replaceAll(".", System.currentTimeMillis() + ".");
 		// Transfer to a new file, which name is generated from the system timestamp.
-		modelTransfer.transfer(source, System.currentTimeMillis() + TARGET_EAPX, false);
+		modelTransfer.transfer(source, target, false);
+
+        // Remove the created file.
+        Files.delete(Paths.get(target));
 	}
 
 	@Test

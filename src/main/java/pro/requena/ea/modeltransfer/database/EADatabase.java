@@ -51,12 +51,15 @@ public class EADatabase {
     private static final Connection connectEap(final String eapFilePath, final boolean isTarget) throws EAModelTransferException {
         try {
             LOG.info("Connecting to EAP file: {}", eapFilePath);
-            // Create the target file if it does not exist.
-            if(isTarget && !Files.exists(Paths.get(eapFilePath))) {
-            	LOG.info("File {} doesn't exist. Copying the Sparx's EAPX template.", eapFilePath);
+            // Create the target file.
+            if(isTarget) {
+                if(Files.exists(Paths.get(eapFilePath))) {
+                    Files.delete(Paths.get(eapFilePath));
+                }
             	Files.copy(Thread.currentThread().getContextClassLoader().getResourceAsStream(EADatabase.DEFAULT_EAPX_PATH),
             			   Paths.get(eapFilePath), StandardCopyOption.REPLACE_EXISTING);
             }
+            // Connect to the EAP file and return the connection.
             return DriverManager.getConnection("jdbc:ucanaccess://" + eapFilePath + ";memory=false;immediatelyReleaseResources=true");
         } catch (Exception e) {
             LOG.error("Couldn't open the EAP file connection.");
