@@ -42,7 +42,7 @@
 
 		<!-- Test dependencies versions. -->
 		<version.junit>4.13.1</version.junit>
-		<version.jdbc.h2>1.4.197</version.jdbc.h2>
+		<version.jdbc.h2>2.0.206</version.jdbc.h2>
 
 		<!-- Maven plugins versions. -->
 		<version.plugin.javadoc>3.0.1</version.plugin.javadoc>
